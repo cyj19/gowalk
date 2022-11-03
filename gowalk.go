@@ -3,6 +3,7 @@ package gowalk
 import (
 	"flag"
 	"github.com/cyj19/gowalk/core"
+	"github.com/cyj19/gowalk/core/logx"
 	"log"
 	"os"
 	"path/filepath"
@@ -29,6 +30,9 @@ func init() {
 	if err != nil {
 		log.Fatalf("LoadConfig error: %+v \n", err)
 	}
+
+	// 初始化日志
+	logx.SetUp()
 }
 
 func Run(args ...core.Component) {

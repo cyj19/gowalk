@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/cyj19/gowalk"
 	"github.com/cyj19/gowalk/component/mysql"
-	"log"
+	"github.com/cyj19/gowalk/core/logx"
 )
 
 /**
@@ -15,17 +15,24 @@ type Student struct {
 	Name string
 }
 
+func (s *Student) TableName() string {
+	return "student"
+}
+
 func main() {
 	gowalk.Run(&mysql.Instance{})
 
 	// 根据结构体创建表
-	_ = mysql.Main().AutoMigrate(&Student{})
+	err := mysql.Main().AutoMigrate(&Student{})
+	if err != nil {
+		logx.Log().Error(err)
+	}
 
-	mysql.Main().Create(&Student{Name: "cyj19"})
+	//mysql.Main().Create(&Student{Name: "cyj19"})
 
 	std := &Student{}
-	mysql.Main().Where("name = ?").First(std)
+	mysql.Main().Where("name = ?", "cyj19").First(std)
 
-	log.Printf("Studen: %+v \n", std)
+	logx.Log().Infof("student: %#v \n", std)
 
 }
