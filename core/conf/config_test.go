@@ -1,4 +1,4 @@
-package core
+package conf
 
 import (
 	"github.com/cyj19/gowalk/component/mysql"

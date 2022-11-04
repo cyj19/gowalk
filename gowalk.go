@@ -3,6 +3,7 @@ package gowalk
 import (
 	"flag"
 	"github.com/cyj19/gowalk/core"
+	"github.com/cyj19/gowalk/core/conf"
 	"github.com/cyj19/gowalk/core/logx"
 	"log"
 	"os"
@@ -26,7 +27,7 @@ func init() {
 	// 加载配置文件
 	configPath := filepath.Join(core.WorkDir, configName)
 
-	err := core.LoadConfig(configPath)
+	err := conf.LoadConfig(configPath)
 	if err != nil {
 		log.Fatalf("LoadConfig error: %+v \n", err)
 	}
