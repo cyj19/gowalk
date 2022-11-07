@@ -14,7 +14,7 @@ const (
 
 type Level int8
 
-func (l Level) SwitchLevel() zapcore.Level {
+func (l Level) switchLevel() zapcore.Level {
 	switch l {
 	case DebugLevel:
 		return zapcore.DebugLevel

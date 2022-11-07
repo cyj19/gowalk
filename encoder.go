@@ -11,7 +11,7 @@ const (
 
 type EncodeLevel int8
 
-func (e EncodeLevel) SwitchEncodeLevel() zapcore.LevelEncoder {
+func (e EncodeLevel) switchEncodeLevel() zapcore.LevelEncoder {
 	switch e {
 	case Capital:
 		return zapcore.CapitalLevelEncoder

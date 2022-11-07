@@ -14,7 +14,7 @@ var (
 	once    sync.Once
 )
 
-func Init() {
+func initConfig() {
 
 	// 获取程序模式 dev/prod
 	flag.StringVar(&EnvMode, "mode", "dev", "Program Environment Mode")
@@ -37,12 +37,12 @@ func Init() {
 	}
 
 	// 初始化日志
-	SetUp()
+	setupLog()
 }
 
 func Run(args ...Component) {
 	once.Do(func() {
-		Init()
+		initConfig()
 	})
 	_ = AddAndLoadComponents(args...)
 }

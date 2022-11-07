@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	defaultLogger Logger
-	logName       = "gowalk"
+	dLog    Logger
+	logName = "gowalk"
 )
 
 type Logger interface {
@@ -44,85 +44,85 @@ type LogConfig struct {
 	Compress    bool        `json:"compress" mapstructure:"compress"`
 }
 
-type DefaultLogger struct {
+type defaultLogger struct {
 	zLog *zap.SugaredLogger
 }
 
-func (d *DefaultLogger) Debug(args ...interface{}) {
+func (d *defaultLogger) Debug(args ...interface{}) {
 	d.zLog.Debug(args...)
 }
 
-func (d *DefaultLogger) Debugf(template string, args ...interface{}) {
+func (d *defaultLogger) Debugf(template string, args ...interface{}) {
 	d.zLog.Debugf(template, args...)
 }
 
-func (d *DefaultLogger) Debugw(msg string, keyAndValues ...interface{}) {
+func (d *defaultLogger) Debugw(msg string, keyAndValues ...interface{}) {
 	d.zLog.Debugw(msg, keyAndValues...)
 }
 
-func (d *DefaultLogger) Info(args ...interface{}) {
+func (d *defaultLogger) Info(args ...interface{}) {
 	d.zLog.Info(args...)
 }
 
-func (d *DefaultLogger) Infof(template string, args ...interface{}) {
+func (d *defaultLogger) Infof(template string, args ...interface{}) {
 	d.zLog.Infof(template, args...)
 }
 
-func (d *DefaultLogger) Infow(msg string, keyAndValues ...interface{}) {
+func (d *defaultLogger) Infow(msg string, keyAndValues ...interface{}) {
 	d.zLog.Infow(msg, keyAndValues...)
 }
 
-func (d *DefaultLogger) Warn(args ...interface{}) {
+func (d *defaultLogger) Warn(args ...interface{}) {
 	d.zLog.Warn(args...)
 }
 
-func (d *DefaultLogger) Warnf(template string, args ...interface{}) {
+func (d *defaultLogger) Warnf(template string, args ...interface{}) {
 	d.zLog.Warnf(template, args...)
 }
 
-func (d *DefaultLogger) Warnw(msg string, keyAndValues ...interface{}) {
+func (d *defaultLogger) Warnw(msg string, keyAndValues ...interface{}) {
 	d.zLog.Warnw(msg, keyAndValues...)
 }
 
-func (d *DefaultLogger) Error(args ...interface{}) {
+func (d *defaultLogger) Error(args ...interface{}) {
 	d.zLog.Error(args...)
 }
 
-func (d *DefaultLogger) Errorf(template string, args ...interface{}) {
+func (d *defaultLogger) Errorf(template string, args ...interface{}) {
 	d.zLog.Errorf(template, args...)
 }
 
-func (d *DefaultLogger) Errorw(msg string, keyAndValues ...interface{}) {
+func (d *defaultLogger) Errorw(msg string, keyAndValues ...interface{}) {
 	d.zLog.Errorw(msg, keyAndValues...)
 }
 
-func (d *DefaultLogger) Panic(args ...interface{}) {
+func (d *defaultLogger) Panic(args ...interface{}) {
 	d.zLog.Panic(args...)
 }
 
-func (d *DefaultLogger) Panicf(template string, args ...interface{}) {
+func (d *defaultLogger) Panicf(template string, args ...interface{}) {
 	d.zLog.Panicf(template, args...)
 }
 
-func (d *DefaultLogger) Panicw(msg string, keyAndValues ...interface{}) {
+func (d *defaultLogger) Panicw(msg string, keyAndValues ...interface{}) {
 	d.zLog.Panicw(msg, keyAndValues...)
 }
 
-func (d *DefaultLogger) Fatal(args ...interface{}) {
+func (d *defaultLogger) Fatal(args ...interface{}) {
 	d.zLog.Fatal(args...)
 }
 
-func (d *DefaultLogger) Fatalf(template string, args ...interface{}) {
+func (d *defaultLogger) Fatalf(template string, args ...interface{}) {
 	d.zLog.Fatalf(template, args...)
 }
 
-func (d *DefaultLogger) Fatalw(msg string, keyAndValues ...interface{}) {
+func (d *defaultLogger) Fatalw(msg string, keyAndValues ...interface{}) {
 	d.zLog.Fatalw(msg, keyAndValues...)
 }
 
-var _ Logger = (*DefaultLogger)(nil)
+var _ Logger = (*defaultLogger)(nil)
 
-func SetUp() error {
+func setupLog() error {
 	cf := &LogConfig{}
 	err := GetConfig("log", cf)
 	if err != nil {
@@ -136,20 +136,20 @@ func SetUp() error {
 		}
 	}
 
-	encoderCfg.EncodeLevel = cf.EncodeLevel.SwitchEncodeLevel()
+	encoderCfg.EncodeLevel = cf.EncodeLevel.switchEncodeLevel()
 
 	encoder := zapcore.NewJSONEncoder(encoderCfg)
 
 	logLevel := zap.LevelEnablerFunc(func(level zapcore.Level) bool {
-		return level >= cf.Level.SwitchLevel()
+		return level >= cf.Level.switchLevel()
 	})
 
-	writeSync := zapcore.NewMultiWriteSyncer(cf.Mode.SwitchWriter(cf)...)
+	writeSync := zapcore.NewMultiWriteSyncer(cf.Mode.switchWriter(cf)...)
 	newCore := zapcore.NewCore(encoder, writeSync, logLevel)
 
 	zl := zap.New(newCore, zap.AddCaller(), zap.AddCallerSkip(1)).Sugar()
 
-	defaultLogger = &DefaultLogger{
+	dLog = &defaultLogger{
 		zLog: zl,
 	}
 
@@ -157,11 +157,12 @@ func SetUp() error {
 
 }
 
+// Log 获取日志对象
 func Log() Logger {
-	return defaultLogger
+	return dLog
 }
 
 // SetLog 设置自定义Log
 func SetLog(l Logger) {
-	defaultLogger = l
+	dLog = l
 }

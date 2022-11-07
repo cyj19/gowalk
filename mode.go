@@ -16,17 +16,17 @@ const (
 
 type Mode int8
 
-func (m Mode) SwitchWriter(cf *LogConfig) []zapcore.WriteSyncer {
+func (m Mode) switchWriter(cf *LogConfig) []zapcore.WriteSyncer {
 	ws := make([]zapcore.WriteSyncer, 0)
 	switch m {
 	case Console:
 		ws = append(ws, zapcore.AddSync(os.Stdout))
 		return ws
 	case File:
-		ws = append(ws, zapcore.AddSync(GenLumberjackWriter(cf)))
+		ws = append(ws, zapcore.AddSync(genLumberjackWriter(cf)))
 		return ws
 	case ConsoleAndFile:
-		ws = append(ws, zapcore.AddSync(os.Stdout), zapcore.AddSync(GenLumberjackWriter(cf)))
+		ws = append(ws, zapcore.AddSync(os.Stdout), zapcore.AddSync(genLumberjackWriter(cf)))
 		return ws
 	}
 
@@ -35,7 +35,7 @@ func (m Mode) SwitchWriter(cf *LogConfig) []zapcore.WriteSyncer {
 	return ws
 }
 
-func GenLumberjackWriter(cf *LogConfig) io.Writer {
+func genLumberjackWriter(cf *LogConfig) io.Writer {
 	if cf.Name != "" {
 		logName = cf.Name
 	}
