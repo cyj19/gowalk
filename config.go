@@ -1,4 +1,4 @@
-package conf
+package gowalk
 
 import "github.com/spf13/viper"
 

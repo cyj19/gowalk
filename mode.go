@@ -1,7 +1,6 @@
-package logx
+package gowalk
 
 import (
-	"github.com/cyj19/gowalk/core"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
@@ -40,7 +39,7 @@ func GenLumberjackWriter(cf *LogConfig) io.Writer {
 	if cf.Name != "" {
 		logName = cf.Name
 	}
-	filename := filepath.Join(core.WorkDir, "log", logName+".log")
+	filename := filepath.Join(WorkDir, "log", logName+".log")
 	return &lumberjack.Logger{
 		Filename:   filename,
 		MaxSize:    cf.MaxSize,

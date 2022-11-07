@@ -1,8 +1,7 @@
-package core
+package gowalk
 
 import (
 	"errors"
-	"github.com/cyj19/gowalk/core/conf"
 )
 
 // Component 组件接口
@@ -26,7 +25,7 @@ func AddAndLoadComponents(args ...Component) error {
 	// 全部组件初始化完成再添加到components
 	for _, c := range args {
 		// 加载组件配置
-		err := conf.GetConfig(c.Name(), c)
+		err := GetConfig(c.Name(), c)
 		if err != nil {
 			return err
 		}
@@ -43,7 +42,7 @@ func AddAndLoadComponents(args ...Component) error {
 func LoadAllComponents() error {
 	for _, c := range components {
 		// 加载组件配置
-		err := conf.GetConfig(c.Name(), c)
+		err := GetConfig(c.Name(), c)
 		if err != nil {
 			return err
 		}

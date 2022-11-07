@@ -1,7 +1,6 @@
-package logx
+package gowalk
 
 import (
-	"github.com/cyj19/gowalk/core/conf"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"time"
@@ -125,7 +124,7 @@ var _ Logger = (*DefaultLogger)(nil)
 
 func SetUp() error {
 	cf := &LogConfig{}
-	err := conf.GetConfig("log", cf)
+	err := GetConfig("log", cf)
 	if err != nil {
 		return err
 	}
