@@ -1,4 +1,4 @@
-package gowalk
+package logx
 
 import (
 	"go.uber.org/zap/zapcore"
@@ -16,17 +16,17 @@ const (
 
 type Mode int8
 
-func (m Mode) switchWriter(cf *LogConfig) []zapcore.WriteSyncer {
+func (m Mode) switchWriter(wd string, cf LogConfig) []zapcore.WriteSyncer {
 	ws := make([]zapcore.WriteSyncer, 0)
 	switch m {
 	case Console:
 		ws = append(ws, zapcore.AddSync(os.Stdout))
 		return ws
 	case File:
-		ws = append(ws, zapcore.AddSync(genLumberjackWriter(cf)))
+		ws = append(ws, zapcore.AddSync(genLumberjackWriter(wd, cf)))
 		return ws
 	case ConsoleAndFile:
-		ws = append(ws, zapcore.AddSync(os.Stdout), zapcore.AddSync(genLumberjackWriter(cf)))
+		ws = append(ws, zapcore.AddSync(os.Stdout), zapcore.AddSync(genLumberjackWriter(wd, cf)))
 		return ws
 	}
 
@@ -35,11 +35,8 @@ func (m Mode) switchWriter(cf *LogConfig) []zapcore.WriteSyncer {
 	return ws
 }
 
-func genLumberjackWriter(cf *LogConfig) io.Writer {
-	if cf.Name != "" {
-		logName = cf.Name
-	}
-	filename := filepath.Join(WorkDir, "log", logName+".log")
+func genLumberjackWriter(wd string, cf LogConfig) io.Writer {
+	filename := filepath.Join(wd, "logs", logName+".log")
 	return &lumberjack.Logger{
 		Filename:   filename,
 		MaxSize:    cf.MaxSize,

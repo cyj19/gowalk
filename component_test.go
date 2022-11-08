@@ -1,6 +1,7 @@
 package gowalk
 
 import (
+	"github.com/cyj19/gowalk/config"
 	"log"
 	"testing"
 )
@@ -18,5 +19,6 @@ func (g *greeter) Name() string {
 }
 
 func TestAddAndLoadComponents(t *testing.T) {
-	Run(&greeter{})
+	_ = config.LoadConfig("./config.dev.yml")
+	_ = AddAndLoadComponents(&greeter{})
 }

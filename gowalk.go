@@ -2,47 +2,58 @@ package gowalk
 
 import (
 	"flag"
-	"log"
+	"fmt"
+	"github.com/cyj19/gowalk/config"
+	"github.com/cyj19/gowalk/logx"
 	"os"
 	"path/filepath"
 	"sync"
 )
 
 var (
-	EnvMode string // 模式 dev/pro
-	WorkDir string // 工作目录
+	envMode string // 模式 dev/prod
+	workDir string // 工作目录
 	once    sync.Once
 )
 
 func initConfig() {
 
 	// 获取程序模式 dev/prod
-	flag.StringVar(&EnvMode, "mode", "dev", "Program Environment Mode")
+	flag.StringVar(&envMode, "mode", "dev", "Program Environment Mode")
 	// 获取工作目录
-	flag.StringVar(&WorkDir, "wd", "", "Work Dir")
+	flag.StringVar(&workDir, "wd", "", "Work Dir")
 	flag.Parse()
 
-	if WorkDir == "" {
-		WorkDir, _ = os.Getwd()
+	if workDir == "" {
+		workDir, _ = os.Getwd()
 	}
 
-	configName := "config." + EnvMode + ".yml"
+	configName := "config." + envMode + ".yml"
 
 	// 加载配置文件
-	configPath := filepath.Join(WorkDir, configName)
+	configPath := filepath.Join(workDir, configName)
 
-	err := LoadConfig(configPath)
+	err := config.LoadConfig(configPath)
 	if err != nil {
-		log.Fatalf("LoadConfig error: %+v \n", err)
+		panic(fmt.Sprintf("LoadConfig error: %+v \n", err))
+	}
+
+	logCfg := logx.LogConfig{}
+	err = config.GetConfig("log", &logCfg)
+	if err != nil {
+		panic(fmt.Sprintf("GetConfig error: %+v \n", err))
 	}
 
 	// 初始化日志
-	setupLog()
+	err = logx.SetupLog(workDir, logCfg)
+	if err != nil {
+		panic(fmt.Sprintf("SetupLog error: %+v \n", err))
+	}
 }
 
-func Run(args ...Component) {
+func Run(args ...Component) error {
 	once.Do(func() {
 		initConfig()
 	})
-	_ = AddAndLoadComponents(args...)
+	return AddAndLoadComponents(args...)
 }

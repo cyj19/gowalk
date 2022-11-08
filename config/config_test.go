@@ -1,4 +1,4 @@
-package gowalk
+package config
 
 import (
 	"testing"

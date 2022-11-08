@@ -1,4 +1,4 @@
-package gowalk
+package logx
 
 import "go.uber.org/zap/zapcore"
 

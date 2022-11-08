@@ -1,4 +1,4 @@
-package gowalk
+package logx
 
 import (
 	"go.uber.org/zap"
@@ -122,11 +122,11 @@ func (d *defaultLogger) Fatalw(msg string, keyAndValues ...interface{}) {
 
 var _ Logger = (*defaultLogger)(nil)
 
-func setupLog() error {
-	cf := &LogConfig{}
-	err := GetConfig("log", cf)
-	if err != nil {
-		return err
+// SetupLog 初始化默认日志
+func SetupLog(wd string, cf LogConfig) error {
+
+	if cf.Name != "" {
+		logName = cf.Name
 	}
 
 	encoderCfg := zap.NewProductionEncoderConfig()
@@ -144,7 +144,7 @@ func setupLog() error {
 		return level >= cf.Level.switchLevel()
 	})
 
-	writeSync := zapcore.NewMultiWriteSyncer(cf.Mode.switchWriter(cf)...)
+	writeSync := zapcore.NewMultiWriteSyncer(cf.Mode.switchWriter(wd, cf)...)
 	newCore := zapcore.NewCore(encoder, writeSync, logLevel)
 
 	zl := zap.New(newCore, zap.AddCaller(), zap.AddCallerSkip(1)).Sugar()
@@ -157,8 +157,8 @@ func setupLog() error {
 
 }
 
-// Log 获取日志对象
-func Log() Logger {
+// Instance 获取日志对象
+func Instance() Logger {
 	return dLog
 }
 
