@@ -3,12 +3,14 @@ package logx
 import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"sync"
 	"time"
 )
 
 var (
-	dLog    Logger
+	gLogger Logger
 	logName = "gowalk"
+	logMu   sync.Mutex
 )
 
 type Logger interface {
@@ -149,7 +151,7 @@ func SetupLog(wd string, cf LogConfig) error {
 
 	zl := zap.New(newCore, zap.AddCaller(), zap.AddCallerSkip(1)).Sugar()
 
-	dLog = &defaultLogger{
+	gLogger = &defaultLogger{
 		zLog: zl,
 	}
 
@@ -157,12 +159,14 @@ func SetupLog(wd string, cf LogConfig) error {
 
 }
 
-// Instance 获取日志对象
-func Instance() Logger {
-	return dLog
+// GetLogger 获取日志对象
+func GetLogger() Logger {
+	return gLogger
 }
 
-// SetLog 设置自定义Log
-func SetLog(l Logger) {
-	dLog = l
+// SetLogger 设置自定义Logger
+func SetLogger(l Logger) {
+	logMu.Lock()
+	defer logMu.Unlock()
+	gLogger = l
 }

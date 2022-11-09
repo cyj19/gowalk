@@ -10,7 +10,7 @@ type greeter struct {
 }
 
 func (g *greeter) Run() error {
-	logx.Instance().Infof("hello, %s", g.name)
+	logx.Infof("hello, %s", g.name)
 	return nil
 }
 
@@ -25,7 +25,7 @@ func main() {
 
 	g, err := gowalk.GetComponent("greeter")
 	if err != nil {
-		logx.Instance().Fatal(err)
+		logx.Fatal(err)
 	}
-	logx.Instance().Infof("greeter: %#v", g)
+	logx.Infof("greeter: %#v", g)
 }
