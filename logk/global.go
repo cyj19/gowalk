@@ -1,4 +1,4 @@
-package logx
+package logk
 
 func Debug(args ...interface{}) {
 	gLogger.Debug(args...)

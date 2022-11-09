@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/cyj19/gowalk"
-	"github.com/cyj19/gowalk/logx"
+	"github.com/cyj19/gowalk/logk"
 )
 
 type greeter struct {
@@ -10,7 +10,7 @@ type greeter struct {
 }
 
 func (g *greeter) Run() error {
-	logx.Infof("hello, %s", g.name)
+	logk.Infof("hello, %s", g.name)
 	return nil
 }
 
@@ -25,7 +25,7 @@ func main() {
 
 	g, err := gowalk.GetComponent("greeter")
 	if err != nil {
-		logx.Fatal(err)
+		logk.Fatal(err)
 	}
-	logx.Infof("greeter: %#v", g)
+	logk.Infof("greeter: %#v", g)
 }

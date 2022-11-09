@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/cyj19/gowalk/config"
-	"github.com/cyj19/gowalk/logx"
+	"github.com/cyj19/gowalk/logk"
 	"os"
 	"path/filepath"
 	"sync"
@@ -38,14 +38,14 @@ func initConfig() {
 		panic(fmt.Sprintf("LoadConfig error: %+v \n", err))
 	}
 
-	logCfg := logx.LogConfig{}
+	logCfg := logk.LogConfig{}
 	err = config.GetConfig("log", &logCfg)
 	if err != nil {
 		panic(fmt.Sprintf("GetConfig error: %+v \n", err))
 	}
 
 	// 初始化日志
-	err = logx.SetupLog(workDir, logCfg)
+	err = logk.SetupLog(workDir, logCfg)
 	if err != nil {
 		panic(fmt.Sprintf("SetupLog error: %+v \n", err))
 	}
