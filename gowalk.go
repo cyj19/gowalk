@@ -7,17 +7,15 @@ import (
 	"github.com/cyj19/gowalk/logk"
 	"os"
 	"path/filepath"
-	"sync"
 )
 
 var (
 	envMode string // 模式 dev/prod
 	workDir string // 工作目录
-	once    sync.Once
 )
 
-func initConfig() {
-
+func init() {
+	// testing.Init()
 	// 获取程序模式 dev/prod
 	flag.StringVar(&envMode, "mode", "dev", "Program Environment Mode")
 	// 获取工作目录
@@ -52,8 +50,5 @@ func initConfig() {
 }
 
 func Run(args ...Component) error {
-	once.Do(func() {
-		initConfig()
-	})
 	return AddAndLoadComponents(args...)
 }

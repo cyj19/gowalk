@@ -8,8 +8,6 @@ import (
 )
 
 func TestApp(t *testing.T) {
-	// 初始化日志
-	logk.SetupLog("./", logk.LogConfig{})
 
 	// http服务：8888
 	mux := http.NewServeMux()
