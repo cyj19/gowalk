@@ -1,7 +1,6 @@
 package gowalk
 
 import (
-	"flag"
 	"fmt"
 	"github.com/cyj19/gowalk/config"
 	"github.com/cyj19/gowalk/logk"
@@ -9,24 +8,10 @@ import (
 	"path/filepath"
 )
 
-var (
-	envMode string // 模式 dev/prod
-	workDir string // 工作目录
-)
-
 func init() {
-	// testing.Init()
-	// 获取程序模式 dev/prod
-	flag.StringVar(&envMode, "mode", "dev", "Program Environment Mode")
-	// 获取工作目录
-	flag.StringVar(&workDir, "wd", "", "Work Dir")
-	flag.Parse()
 
-	if workDir == "" {
-		workDir, _ = os.Getwd()
-	}
-
-	configName := "config." + envMode + ".yml"
+	workDir, _ := os.Getwd()
+	configName := "config.yml"
 
 	// 加载配置文件
 	configPath := filepath.Join(workDir, configName)

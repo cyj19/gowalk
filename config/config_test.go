@@ -14,7 +14,7 @@ type item struct {
 }
 
 func TestLoadComponentConfig(t *testing.T) {
-	configPath := "./config.dev.yml"
+	configPath := "../config.yml"
 	err := LoadConfig(configPath)
 	if err != nil {
 		t.Error(err)
