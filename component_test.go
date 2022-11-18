@@ -1,8 +1,7 @@
 package gowalk
 
 import (
-	"github.com/cyj19/gowalk/config"
-	"log"
+	"github.com/cyj19/gowalk/logk"
 	"testing"
 )
 
@@ -10,7 +9,7 @@ type greeter struct {
 }
 
 func (g *greeter) Run() error {
-	log.Println("loading greeter...")
+	logk.GetLogger().Info("loading greeter...")
 	return nil
 }
 
@@ -19,6 +18,5 @@ func (g *greeter) Name() string {
 }
 
 func TestAddAndLoadComponents(t *testing.T) {
-	_ = config.LoadConfig("./config.dev.yml")
 	_ = AddAndLoadComponents(&greeter{})
 }

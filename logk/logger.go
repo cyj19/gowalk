@@ -149,7 +149,7 @@ func SetupLog(wd string, cf LogConfig) error {
 	writeSync := zapcore.NewMultiWriteSyncer(cf.Mode.switchWriter(wd, cf)...)
 	newCore := zapcore.NewCore(encoder, writeSync, logLevel)
 
-	zl := zap.New(newCore, zap.AddCaller(), zap.AddCallerSkip(2)).Sugar()
+	zl := zap.New(newCore, zap.AddCaller(), zap.AddCallerSkip(1)).Sugar()
 
 	gLogger = &defaultLogger{
 		zLog: zl,

@@ -38,7 +38,7 @@ func NewServer(ip string, port int, opts ...ServerOption) (*Server, error) {
 }
 
 func (s *Server) Start(ctx context.Context) error {
-	logk.Infof("[UDP Server listening on: %s]", s.lis.LocalAddr())
+	logk.GetLogger().Infof("[UDP Server listening on: %s]", s.lis.LocalAddr())
 	return s.runFunc(ctx, s.lis)
 }
 
@@ -46,7 +46,7 @@ func (s *Server) Stop(ctx context.Context) error {
 	if done := ctx.Done(); done != nil {
 		<-done
 	}
-	logk.Infof("[UDP Server stopping: %s]", s.lis.LocalAddr())
+	logk.GetLogger().Infof("[UDP Server stopping: %s]", s.lis.LocalAddr())
 	return s.lis.Close()
 }
 
