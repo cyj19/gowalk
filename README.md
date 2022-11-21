@@ -10,6 +10,7 @@ gowalk 一个简单易用的Golang后端开发框架，开箱即用，通过加�
 ### 组件
 > 开发中，持续更新
 
+传送门：[gowalk-components](https://github.com/cyj19/gowalk-components)
 
 ### 使用
 1. 框架约定在当前目录下加载名为config.yml的配置文件
