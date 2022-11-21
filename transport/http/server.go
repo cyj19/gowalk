@@ -60,12 +60,12 @@ func (s *Server) Start(ctx context.Context) error {
 	s.srv.BaseContext = func(listener net.Listener) context.Context {
 		return ctx
 	}
-	logk.GetLogger().Infof("[HTTP] server listening on: %s", s.srv.Addr)
+	logk.Infof("[HTTP] server listening on: %s", s.srv.Addr)
 	return s.srv.ListenAndServe()
 }
 
 func (s *Server) Stop(ctx context.Context) error {
-	logk.GetLogger().Infof("[HTTP] server stopping: %s", s.srv.Addr)
+	logk.Infof("[HTTP] server stopping: %s", s.srv.Addr)
 	return s.srv.Shutdown(ctx)
 }
 

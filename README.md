@@ -22,7 +22,7 @@ type greeter struct {
 
 // 实现component接口
 func (g *greeter) Run() error {
-    logk.GetLogger().Infof("hello, %s", g.name)
+    logk.Infof("hello, %s", g.name)
     return nil
 }
 
@@ -38,9 +38,9 @@ func main() {
     
     g, err := gowalk.GetComponent("greeter")
     if err != nil {
-        logk.GetLogger().Fatal(err)
+        logk.Fatal(err)
     }
-    logk.GetLogger().Infof("greeter: %#v", g)
+    logk.Infof("greeter: %#v", g)
 }
 
 ```

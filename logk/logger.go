@@ -1,6 +1,7 @@
 package logk
 
 import (
+	"github.com/cyj19/gowalk/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"sync"
@@ -8,7 +9,7 @@ import (
 )
 
 var (
-	gLogger Logger
+	dLogger Logger
 	logName = "gowalk"
 	logMu   sync.Mutex
 )
@@ -32,6 +33,9 @@ type Logger interface {
 	Fatal(...interface{})
 	Fatalf(string, ...interface{})
 	Fatalw(string, ...interface{})
+	Skip(int) Logger      // 返回溯源n层的Logger
+	PoolGet() interface{} // 从对象池中获取实际的Logger对象
+	PoolPut(interface{})  // 把实例对象放回对象池
 }
 
 type LogConfig struct {
@@ -47,79 +51,99 @@ type LogConfig struct {
 }
 
 type defaultLogger struct {
-	zLog *zap.SugaredLogger
+	zLog *zap.Logger
 }
 
 func (d *defaultLogger) Debug(args ...interface{}) {
-	d.zLog.Debug(args...)
+	d.zLog.Sugar().Debug(args...)
 }
 
 func (d *defaultLogger) Debugf(template string, args ...interface{}) {
-	d.zLog.Debugf(template, args...)
+	d.zLog.Sugar().Debugf(template, args...)
 }
 
 func (d *defaultLogger) Debugw(msg string, keyAndValues ...interface{}) {
-	d.zLog.Debugw(msg, keyAndValues...)
+	d.zLog.Sugar().Debugw(msg, keyAndValues...)
 }
 
 func (d *defaultLogger) Info(args ...interface{}) {
-	d.zLog.Info(args...)
+	d.zLog.Sugar().Info(args...)
 }
 
 func (d *defaultLogger) Infof(template string, args ...interface{}) {
-	d.zLog.Infof(template, args...)
+	d.zLog.Sugar().Infof(template, args...)
 }
 
 func (d *defaultLogger) Infow(msg string, keyAndValues ...interface{}) {
-	d.zLog.Infow(msg, keyAndValues...)
+	d.zLog.Sugar().Infow(msg, keyAndValues...)
 }
 
 func (d *defaultLogger) Warn(args ...interface{}) {
-	d.zLog.Warn(args...)
+	d.zLog.Sugar().Warn(args...)
 }
 
 func (d *defaultLogger) Warnf(template string, args ...interface{}) {
-	d.zLog.Warnf(template, args...)
+	d.zLog.Sugar().Warnf(template, args...)
 }
 
 func (d *defaultLogger) Warnw(msg string, keyAndValues ...interface{}) {
-	d.zLog.Warnw(msg, keyAndValues...)
+	d.zLog.Sugar().Warnw(msg, keyAndValues...)
 }
 
 func (d *defaultLogger) Error(args ...interface{}) {
-	d.zLog.Error(args...)
+	d.zLog.Sugar().Error(args...)
 }
 
 func (d *defaultLogger) Errorf(template string, args ...interface{}) {
-	d.zLog.Errorf(template, args...)
+	d.zLog.Sugar().Errorf(template, args...)
 }
 
 func (d *defaultLogger) Errorw(msg string, keyAndValues ...interface{}) {
-	d.zLog.Errorw(msg, keyAndValues...)
+	d.zLog.Sugar().Errorw(msg, keyAndValues...)
 }
 
 func (d *defaultLogger) Panic(args ...interface{}) {
-	d.zLog.Panic(args...)
+	d.zLog.Sugar().Panic(args...)
 }
 
 func (d *defaultLogger) Panicf(template string, args ...interface{}) {
-	d.zLog.Panicf(template, args...)
+	d.zLog.Sugar().Panicf(template, args...)
 }
 
 func (d *defaultLogger) Panicw(msg string, keyAndValues ...interface{}) {
-	d.zLog.Panicw(msg, keyAndValues...)
+	d.zLog.Sugar().Panicw(msg, keyAndValues...)
 }
 
 func (d *defaultLogger) Fatal(args ...interface{}) {
-	d.zLog.Fatal(args...)
+	d.zLog.Sugar().Fatal(args...)
 }
 
 func (d *defaultLogger) Fatalf(template string, args ...interface{}) {
-	d.zLog.Fatalf(template, args...)
+	d.zLog.Sugar().Fatalf(template, args...)
 }
 
 func (d *defaultLogger) Fatalw(msg string, keyAndValues ...interface{}) {
-	d.zLog.Fatalw(msg, keyAndValues...)
+	d.zLog.Sugar().Fatalw(msg, keyAndValues...)
+}
+
+func (d *defaultLogger) Skip(k int) Logger {
+	// clone
+	dc := d.PoolGet().(*defaultLogger)
+	*dc = *d
+	l := dc.zLog.WithOptions(zap.AddCallerSkip(k))
+	dc.zLog = l
+	return dc
+}
+
+func (d *defaultLogger) PoolGet() interface{} {
+	return defaultLoggerPool.Get()
+}
+
+func (d *defaultLogger) PoolPut(v interface{}) {
+	dc := v.(*defaultLogger)
+	// 清空临时对象的字段
+	dc.zLog = nil
+	defaultLoggerPool.Put(v)
 }
 
 var _ Logger = (*defaultLogger)(nil)
@@ -149,10 +173,9 @@ func SetupLog(wd string, cf LogConfig) error {
 	writeSync := zapcore.NewMultiWriteSyncer(cf.Mode.switchWriter(wd, cf)...)
 	newCore := zapcore.NewCore(encoder, writeSync, logLevel)
 
-	zl := zap.New(newCore, zap.AddCaller(), zap.AddCallerSkip(1)).Sugar()
-
-	gLogger = &defaultLogger{
-		zLog: zl,
+	l := zap.New(newCore, zap.AddCaller(), zap.AddCallerSkip(1))
+	dLogger = &defaultLogger{
+		zLog: l,
 	}
 
 	return nil
@@ -161,12 +184,22 @@ func SetupLog(wd string, cf LogConfig) error {
 
 // GetLogger 获取日志对象
 func GetLogger() Logger {
-	return gLogger
+	logMu.Lock()
+	defer logMu.Unlock()
+	return dLogger
 }
 
-// SetLogger 设置自定义Logger
+// SetLogger 设置自定义Logger，同时需要注意更新组件的Logger
 func SetLogger(l Logger) {
 	logMu.Lock()
 	defer logMu.Unlock()
-	gLogger = l
+	dLogger = l
+}
+
+func Revert() {
+	logMu.Lock()
+	defer logMu.Unlock()
+	logCfg := LogConfig{}
+	_ = config.GetConfig("log", &logCfg)
+	_ = SetupLog("./", logCfg)
 }

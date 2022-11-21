@@ -40,7 +40,7 @@ func NewServer(addr string, opts ...ServerOption) (*Server, error) {
 }
 
 func (s *Server) Start(ctx context.Context) error {
-	logk.GetLogger().Infof("[TCP Server listening on: %s]", s.lis.Addr())
+	logk.Infof("[TCP Server listening on: %s]", s.lis.Addr())
 	return s.runFunc(ctx, s.lis)
 }
 
@@ -48,7 +48,7 @@ func (s *Server) Stop(ctx context.Context) error {
 	if done := ctx.Done(); done != nil {
 		<-done
 	}
-	logk.GetLogger().Infof("[TCP Server stopping: %s]", s.lis.Addr())
+	logk.Infof("[TCP Server stopping: %s]", s.lis.Addr())
 	return s.lis.Close()
 }
 

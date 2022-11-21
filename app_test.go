@@ -12,7 +12,7 @@ func TestApp(t *testing.T) {
 	// http服务：8888
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		logk.GetLogger().Info(r.URL.Path)
+		logk.Info(r.URL.Path)
 		w.Write([]byte("pong"))
 	})
 	hs := khttp.NewServer(":8888", khttp.Handler(mux))
@@ -20,7 +20,7 @@ func TestApp(t *testing.T) {
 	// http服务：8889
 	mux2 := http.NewServeMux()
 	mux2.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
-		logk.GetLogger().Info(r.URL.Path)
+		logk.Info(r.URL.Path)
 		w.Write([]byte("hello world"))
 	})
 
@@ -29,6 +29,6 @@ func TestApp(t *testing.T) {
 	app := New(Servers(hs, hs2))
 
 	if err := app.Run(); err != nil {
-		logk.GetLogger().Fatal(err)
+		logk.Fatal(err)
 	}
 }

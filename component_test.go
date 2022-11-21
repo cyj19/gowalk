@@ -9,7 +9,7 @@ type greeter struct {
 }
 
 func (g *greeter) Run() error {
-	logk.GetLogger().Info("loading greeter...")
+	logk.Info("loading greeter...")
 	return nil
 }
 
