@@ -11,7 +11,7 @@ import (
 var (
 	dLogger Logger
 	logName = "gowalk"
-	logMu   sync.Mutex
+	logMu   sync.RWMutex
 )
 
 type Logger interface {
@@ -184,8 +184,8 @@ func SetupLog(wd string, cf LogConfig) error {
 
 // GetLogger 获取日志对象
 func GetLogger() Logger {
-	logMu.Lock()
-	defer logMu.Unlock()
+	logMu.RLock()
+	defer logMu.RUnlock()
 	return dLogger
 }
 
